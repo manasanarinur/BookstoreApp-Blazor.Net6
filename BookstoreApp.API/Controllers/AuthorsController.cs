@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BookstoreApp.API.Data;
+using AutoMapper;
+using BookstoreApp.API.Models.Author;
 
 namespace BookstoreApp.API.Controllers
 {
@@ -14,10 +16,12 @@ namespace BookstoreApp.API.Controllers
     public class AuthorsController : ControllerBase
     {
         private readonly BookStoreDbContext _context;
+        private readonly IMapper mapper;
 
-        public AuthorsController(BookStoreDbContext context)
+        public AuthorsController(BookStoreDbContext context,IMapper mapper)
         {
             _context = context;
+            this.mapper = mapper;
         }
 
         // GET: api/Authors
@@ -83,13 +87,15 @@ namespace BookstoreApp.API.Controllers
         // POST: api/Authors
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Author>> PostAuthor(Author author)
+        public async Task<ActionResult<AuthorCreateDto>> PostAuthor(AuthorCreateDto  authorDto)
         {
+            
           if (_context.Authors == null)
           {
               return Problem("Entity set 'BookStoreDbContext.Authors'  is null.");
           }
 
+            var author = mapper.Map<Author>(authorDto);
              await _context.Authors.AddAsync(author);
             await _context.SaveChangesAsync();
 
